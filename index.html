@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Total-Teka</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Pumapro">
+  <meta name="keywords" content="Películas, series, comics, mangas, libros, música">
+  <meta name="description" content="Toda la información sobre todos los temas posibles del mundo en la biblioteca mas grnde del mundo.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body{
+      background: #000;
+    }
+    .titulo{
+      width: 100%;
+    }
+    nav{
+      text-align: center;
+    }
+    #cards {
+      display: flex;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
+    }/*
+    .tarjeta {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      text-align: center;
+      border: 1px solid #eee;
+    } */
+    .tarjeta {
+      position: relative;
+      width: 171px;
+      margin: 20px 0px 0px 0px;
+      text-align: center;
+      border: 1px solid #ccc;
+      color: white;
+      font-weight: bold;
+    }
+    .tarjeta.comic {
+      background-color: blue;
+      border-color: blue;
+    }
+    .tarjeta.comic .h3{
+      background-color: blue;
+    }
+        .tarjeta.libro {
+      background-color: green;
+      border-color: green;
+    }
+    .tarjeta.libro .h3{
+      background-color: green;
+    }
+    .tarjeta.manga {
+      background-color: #257AF8;
+      border-color: #257AF8;
+    }
+    .tarjeta.manga .h3{
+      background-color: #257AF8;
+    }
+    .tarjeta.novela {
+      background-color: white;
+      border-color: white;
+      color: black;
+    }
+    .tarjeta.novela .h3{
+      background-color: white;
+    }
+    .tarjeta.pelicula {
+      background-color: black;
+      border-color: black;
+    }
+    .tarjeta.pelicula .h3{
+      background-color: black;
+    }
+    .tarjeta.serie {
+      background-color: #EA1014;
+      border-color: #EA1014;
+    }
+    .tarjeta.serie .h3{
+      background-color: #EA1014;
+    }
+    .tarjeta.videojuego {
+      background-color: orange;
+      border-color: orange;
+    }
+    .tarjeta.videojuego .h3{
+      background-color: orange;
+    }
+    /* Contenedor de la imagen 17x26 */
+    .images img {
+      width: 170px;
+      height: 260px;
+      display: block;
+    }    
+    .tarjeta .h2 {
+      font-size: 1.2rem;
+      margin: 15px 5px;
+    }    
+     .tarjeta .h3 {
+      font-size: 1.2rem;
+      position: absolute;
+      padding: 4px;
+      top: 0px;
+      right: 0px;
+      z-index: 10;
+    }    
+    #paginacion button {
+      padding: 8px 16px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }    
+    #paginacion button:hover {
+      background-color: #0056b3;
+    }
+    #paginacion button[style*="gray"] {
+      background-color: #6c757d !important; /* Color para la página actual */
+      cursor: default;
+    }
+    footer{
+      color: white;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <img class="titulo" src="titulo.png">
+  <nav>
+  <select id="filtroTipo" onchange="aplicarFiltros()">
+    <option value="Todos">Todos</option>
+    <option value="Comic">Cómic</option>
+    <option value="Manga">Manga</option>
+    <option value="Novela">Novela</option>
+    <option value="Pelicula">Película</option>
+    <option value="Serie">Serie</option>
+    <option value="Videojuego">Videojuego</option>
+  </select>
+  <select id="ordenar" onchange="aplicarFiltros()">
+    <option value="abc">Nombre (A-Z)</option>
+    <option value="cba">Nombre (Z-A)</option>
+    <option value="año-asc">Año (0-9)</option>
+    <option value="año-desc">Año (9-0)</option>
+  </select>
+  <select id="filtroPais" onchange="aplicarFiltros()">
+    <option value="">Todos los Países</option>
+    <option value="Francia">Francia</option>
+    <option value="Japón">Japón</option>
+  </select>
+  <select id="filtroAutor" onchange="aplicarFiltros()">
+    <option value="">Todos los Autores</option>
+    <option value="Masashi Kishimoto">Masashi Kishimoto</option>
+    <option value="Pierre Boulle">Pierre Boulle</option>
+  </select>
+  <select id="filtroEditor" onchange="aplicarFiltros()">
+    <option value="">Todos los Editores</option>
+    <option value="Éditions Julliard">Éditions Julliard</option>
+    <option value="Shueisha">Shueisha</option>
+  </select>
+  </nav>
+  <div id="cards"></div>
+  <!-- Aquí se inyectarán los números de página -->
+  <div id="paginacion" style="display:flex; gap:10px; justify-content:center; margin-top:20px;"></div>
+    <br>
+  <hr>
+  <br>
+  <footer>
+    <p>Biblioteca de Pumapro y Paloma</p>
+    <p>Todos los derechos reservados</p>
+    <br>
+  </footer>
+<script>
+  class contenido {
+    constructor(nombre,nombre2,nombre3,nombre4,tipo,pais,año,autor,guion,arte,revista,editor,imagen) {
+      this.nombre = nombre,
+      this.nombre2 = nombre2,
+      this.nombre3 = nombre3,
+      this.nombre4 = nombre4,
+      this.tipo = tipo,     
+      this.pais = pais,
+      this.año = año,
+      this.autor = autor,
+      this.guion = guion,
+      this.arte = arte,
+      this.revista = revista,
+      this.editor = editor,
+      this.imagen = imagen
+    }
+  }
+  let cards = document.getElementById("cards")
+  let datos = []
+  
+  
+  datos.push(new contenido('#MeToo～AV出演を強要された私～','#MeToo～AV出演を強要された私～','','','Manga','','1980','','','','','','img/t0000000024.jpg'))
+  datos.push(new contenido('#DRCL midnight children','#DRCL midnight children','','','Manga','','1980','','','','','','img/t0000000023.jpg'))
+  datos.push(new contenido('#えあかつ 無名絵師からの絵垢活動記','#E a Katsu Mumei Eshi Kara No E Aka Katsudo Ki','','','Manga','','1980','','','','','','img/t0000000022.jpg'))
+  datos.push(new contenido('The Babadook','The Babadook','','','Pelicula','','2014','','','','','','img/t0000000021.jpg'))
+  datos.push(new contenido('Cannibal Holocaust','Cannibal Holocaust','','','Pelicula','','1980','','','','','','img/t0000000020.jpg'))
+  datos.push(new contenido('The Blair Witch Project','The Blair Witch Project','','','Pelicula','','1999','','','','','','img/t0000000019.jpg'))
+  datos.push(new contenido('V/H/S','V/H/S','','','Pelicula','','2012','','','','','','img/t0000000018.jpg'))
+  datos.push(new contenido('Maniac','Maniac','','','Pelicula','','2012','','','','','','img/t0000000017.jpg'))
+  datos.push(new contenido('Paranormal Activity','Paranormal Activity','','','Pelicula','','2007','','','','','','img/t0000000016.jpg'))
+  datos.push(new contenido('The Fourth Kind','The Fourth Kind','','','Pelicula','','2009','','','','','','img/t0000000015.jpg'))
+  datos.push(new contenido('As Above, So Below','As Above, So Below','','','Pelicula','','2014','','','','','','img/t0000000014.jpg'))
+  datos.push(new contenido('ガンドライバー','Gandoraibā','Gun Driver','','Manga','Japón','1994','','','','','','img/t0000000013.jpg'))
+  datos.push(new contenido('Hercai','Hercai','','','Serie','Turkia','2019','','','','','','img/t0000000012.jpg'))
+  datos.push(new contenido('FIFA 18','FIFA 18','','','Videojuego','','2017','','','','','','img/t0000000011.png'))
+  datos.push(new contenido('Apocalypse','Apocalypse','','','Videojuego','','1998','','','','','','img/t0000000010.jpg'))
+  datos.push(new contenido('#34歳シェアハウスのオーナー始めます','34-sai Share House no Owner Hajimemasu','','A los 34, comienzo a ser dueña de una casa compartida','Manga','Japón','2021','Yoshiko Kon (近由子)','','','','','img/t0000000009.jpg'))
+  datos.push(new contenido('Absolute Batman','Absolute Batman','','','Comic','Estados Unidos','2024','','','','','','img/t0000000008.jpg'))
+  datos.push(new contenido('ドラゴンボール','Doragon Bōru','Dragon Ball','','Manga','Japón','1984','Akira Toriyama','','','','','img/t0000000007.png'))
+  datos.push(new contenido('Matrix','Matrix','','','Pelicula','Estados Unidos','1999','','','','','','img/t0000000006.png'))
+  datos.push(new contenido('Popeye','Popeye','','','Comic','','1919','','','','','','img/t0000000005.jpg'))
+  datos.push(new contenido('Frankestein','Frankestein','','','Libro','','1818','','','','','','img/t0000000004.jpg'))
+  datos.push(new contenido('Die Hard','Die Hard','Duro de matar','','Pelicula','','1988','','','','','','img/t0000000003.jpg'))
+  datos.push(new contenido('ナルト','Naruto','','','Manga','Japón','1999','Masashi Kishimoto','','','','Shueisha','img/t0000000002.jpg'))
+  datos.push(new contenido('La Planète des singes','La Planète des singes','Planet of the Apes','El Planeta de los Simios','Novela','Francia','1963','Pierre Boulle','','','','Éditions Julliard','img/t0000000001.jpg'))
+
+  let datosFiltrados = [...datos];
+  let paginaActual = 1;
+  const itemsPorPagina = 3;
+
+  function aplicarFiltros() {
+    const tipoSel = document.getElementById('filtroTipo').value;
+    const paisSel = document.getElementById('filtroPais').value;
+    const autorSel = document.getElementById('filtroAutor').value;
+    const editorSel = document.getElementById('filtroEditor').value;
+    const ordenSel = document.getElementById('ordenar').value;
+
+    // 1. Filtrar
+  datosFiltrados = datos.filter(item => {
+    return (tipoSel === 'Todos' || item.tipo === tipoSel) &&
+           (paisSel === '' || item.pais === paisSel) &&
+           (autorSel === '' || item.autor === autorSel) &&
+           (editorSel === '' || item.editor === editorSel);
+  });
+
+    // 2. Ordenar
+  datosFiltrados.sort((a, b) => {
+    if (ordenSel === 'abc') return a.nombre2.localeCompare(b.nombre2);
+    if (ordenSel === 'cba') return b.nombre2.localeCompare(a.nombre2);
+    if (ordenSel === 'año-asc') return a.año - b.año || a.nombre2.localeCompare(b.nombre2);
+    if (ordenSel === 'año-desc') return b.año - a.año || b.nombre2.localeCompare(a.nombre2);
+  });
+
+    // 3. Reiniciar a página 1 y refrescar
+  paginaActual = 1;
+    mostrardatos();
+  }
+
+  function mostrardatos() {
+    cards.innerHTML = "";
+    const inicio = (paginaActual - 1) * itemsPorPagina;
+    const fin = inicio + itemsPorPagina;
+    const datosPaginados = datosFiltrados.slice(inicio, fin);
+  
+    datosPaginados.forEach(i => {
+    
+      let claseTipo = i.tipo.toLowerCase().replace(/\s+/g, '-');
+      
+      cards.innerHTML += `
+        <div class="tarjeta ${claseTipo}">
+          <div class="images">
+            <img src="${i.imagen}">
+          </div>
+          <p class="h2">${i.nombre}</p>
+          <p class="h3">${i.año}</p>
+        </div>
+     `;
+    });
+    crearBotonesPaginacion();
+  }
+  
+function crearBotonesPaginacion() {
+    const contenedorPaginacion = document.getElementById('paginacion');
+    contenedorPaginacion.innerHTML = "";
+    const totalPaginas = Math.ceil(datosFiltrados.length / itemsPorPagina);
+
+    // Si no hay páginas, no hacemos nada
+    if (totalPaginas <= 1) return;
+
+    // Configuración: cuántos botones mostrar a los lados de la página actual
+    const rango = 2; 
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        // Lógica para mostrar: la primera, la última, y las cercanas a la actual
+        if (i === 1 || i === totalPaginas || (i >= paginaActual - rango && i <= paginaActual + rango)) {
+            const boton = document.createElement('button');
+            boton.innerText = i;
+            
+            // Estilo para el botón activo
+            if (i === paginaActual) {
+                boton.style.backgroundColor = "#007bff"; // Azul para la actual
+                boton.style.color = "white";
+            } else {
+                boton.style.backgroundColor = "gray";
+            }
+
+            boton.onclick = function() {
+                paginaActual = i;
+                mostrardatos();
+                // Al cambiar de página, volvemos a dibujar los botones para actualizar el rango
+                crearBotonesPaginacion(); 
+            };
+            contenedorPaginacion.appendChild(boton);
+        } else if (i === paginaActual - rango - 1 || i === paginaActual + rango + 1) {
+            // Añadimos puntos suspensivos para indicar que hay más páginas
+            const puntos = document.createElement('span');
+            puntos.innerText = "...";
+            puntos.style.margin = "0 5px";
+            contenedorPaginacion.appendChild(puntos);
+        }
+    }
+}
+
+  
+  mostrardatos();
+</script>
+</body>
+</html>
