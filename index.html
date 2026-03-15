@@ -173,7 +173,30 @@
     <p>Todos los derechos reservados</p>
     <br>
   </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // 2. Configuramos la conexión con tus datos de Supabase
+    const _supabase = supabase.createClient(
+      'https://opkserkawziqdsvkyhky.supabase.co', 
+      'TU_LLAVE_ANON_PUBLICA_AQUI'
+    );
+
+    // 3. Modificamos la función para que traiga los datos de la tabla
+    async function cargarDesdeSupabase() {
+      const { data, error } = await _supabase
+        .from('biblioteca') // El nombre de tu tabla
+        .select('*');
+
+      if (data) {
+        datos = data; // Reemplaza la lista manual 'datos.push'
+        datosFiltrados = [...datos];
+        mostrardatos(); // Dibuja las tarjetas en pantalla
+      }
+    }
+
+    // Ejecutamos la carga al abrir la página
+    cargarDesdeSupabase();
+  
   class contenido {
     constructor(nombre,nombre2,nombre3,nombre4,tipo,pais,año,autor,guion,arte,revista,editor,imagen) {
       this.nombre = nombre,
@@ -296,30 +319,9 @@ function crearBotonesPaginacion() {
   
   mostrardatos();
 </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // 2. Configuramos la conexión con tus datos de Supabase
-    const _supabase = supabase.createClient(
-      'https://opkserkawziqdsvkyhky.supabase.co', 
-      'TU_LLAVE_ANON_PUBLICA_AQUI'
-    );
-
-    // 3. Modificamos la función para que traiga los datos de la tabla
-    async function cargarDesdeSupabase() {
-      const { data, error } = await _supabase
-        .from('biblioteca') // El nombre de tu tabla
-        .select('*');
-
-      if (data) {
-        datos = data; // Reemplaza la lista manual 'datos.push'
-        datosFiltrados = [...datos];
-        mostrardatos(); // Dibuja las tarjetas en pantalla
-      }
-    }
-
-    // Ejecutamos la carga al abrir la página
-    cargarDesdeSupabase();
+    
   </script>
 </body>
 </html>
