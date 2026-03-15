@@ -193,32 +193,6 @@
   }
   let cards = document.getElementById("cards")
   let datos = []
-  
-  
-  datos.push(new contenido('#MeToo～AV出演を強要された私～','#MeToo～AV出演を強要された私～','','','Manga','','1980','','','','','','img/t0000000024.jpg'))
-  datos.push(new contenido('#DRCL midnight children','#DRCL midnight children','','','Manga','','1980','','','','','','img/t0000000023.jpg'))
-  datos.push(new contenido('#えあかつ 無名絵師からの絵垢活動記','#E a Katsu Mumei Eshi Kara No E Aka Katsudo Ki','','','Manga','','1980','','','','','','img/t0000000022.jpg'))
-  datos.push(new contenido('The Babadook','The Babadook','','','Pelicula','','2014','','','','','','img/t0000000021.jpg'))
-  datos.push(new contenido('Cannibal Holocaust','Cannibal Holocaust','','','Pelicula','','1980','','','','','','img/t0000000020.jpg'))
-  datos.push(new contenido('The Blair Witch Project','The Blair Witch Project','','','Pelicula','','1999','','','','','','img/t0000000019.jpg'))
-  datos.push(new contenido('V/H/S','V/H/S','','','Pelicula','','2012','','','','','','img/t0000000018.jpg'))
-  datos.push(new contenido('Maniac','Maniac','','','Pelicula','','2012','','','','','','img/t0000000017.jpg'))
-  datos.push(new contenido('Paranormal Activity','Paranormal Activity','','','Pelicula','','2007','','','','','','img/t0000000016.jpg'))
-  datos.push(new contenido('The Fourth Kind','The Fourth Kind','','','Pelicula','','2009','','','','','','img/t0000000015.jpg'))
-  datos.push(new contenido('As Above, So Below','As Above, So Below','','','Pelicula','','2014','','','','','','img/t0000000014.jpg'))
-  datos.push(new contenido('ガンドライバー','Gandoraibā','Gun Driver','','Manga','Japón','1994','','','','','','img/t0000000013.jpg'))
-  datos.push(new contenido('Hercai','Hercai','','','Serie','Turkia','2019','','','','','','img/t0000000012.jpg'))
-  datos.push(new contenido('FIFA 18','FIFA 18','','','Videojuego','','2017','','','','','','img/t0000000011.png'))
-  datos.push(new contenido('Apocalypse','Apocalypse','','','Videojuego','','1998','','','','','','img/t0000000010.jpg'))
-  datos.push(new contenido('#34歳シェアハウスのオーナー始めます','34-sai Share House no Owner Hajimemasu','','A los 34, comienzo a ser dueña de una casa compartida','Manga','Japón','2021','Yoshiko Kon (近由子)','','','','','img/t0000000009.jpg'))
-  datos.push(new contenido('Absolute Batman','Absolute Batman','','','Comic','Estados Unidos','2024','','','','','','img/t0000000008.jpg'))
-  datos.push(new contenido('ドラゴンボール','Doragon Bōru','Dragon Ball','','Manga','Japón','1984','Akira Toriyama','','','','','img/t0000000007.png'))
-  datos.push(new contenido('Matrix','Matrix','','','Pelicula','Estados Unidos','1999','','','','','','img/t0000000006.png'))
-  datos.push(new contenido('Popeye','Popeye','','','Comic','','1919','','','','','','img/t0000000005.jpg'))
-  datos.push(new contenido('Frankestein','Frankestein','','','Libro','','1818','','','','','','img/t0000000004.jpg'))
-  datos.push(new contenido('Die Hard','Die Hard','Duro de matar','','Pelicula','','1988','','','','','','img/t0000000003.jpg'))
-  datos.push(new contenido('ナルト','Naruto','','','Manga','Japón','1999','Masashi Kishimoto','','','','Shueisha','img/t0000000002.jpg'))
-  datos.push(new contenido('La Planète des singes','La Planète des singes','Planet of the Apes','El Planeta de los Simios','Novela','Francia','1963','Pierre Boulle','','','','Éditions Julliard','img/t0000000001.jpg'))
 
   let datosFiltrados = [...datos];
   let paginaActual = 1;
@@ -322,5 +296,30 @@ function crearBotonesPaginacion() {
   
   mostrardatos();
 </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // 2. Configuramos la conexión con tus datos de Supabase
+    const _supabase = supabase.createClient(
+      'https://opkserkawziqdsvkyhky.supabase.co', 
+      'TU_LLAVE_ANON_PUBLICA_AQUI'
+    );
+
+    // 3. Modificamos la función para que traiga los datos de la tabla
+    async function cargarDesdeSupabase() {
+      const { data, error } = await _supabase
+        .from('biblioteca') // El nombre de tu tabla
+        .select('*');
+
+      if (data) {
+        datos = data; // Reemplaza la lista manual 'datos.push'
+        datosFiltrados = [...datos];
+        mostrardatos(); // Dibuja las tarjetas en pantalla
+      }
+    }
+
+    // Ejecutamos la carga al abrir la página
+    cargarDesdeSupabase();
+  </script>
 </body>
 </html>
