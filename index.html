@@ -175,34 +175,38 @@
   </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // 2. Configuramos la conexión con tus datos de Supabase
-    const _supabase = supabase.createClient(
-      'https://opkserkawziqdsvkyhky.supabase.co', 
-      'sb_publishable_U6Ljq3yho2djlRpkhcn9Cg_febIPxRj'
-    );
+// 1. Esto debe ir al inicio de tu bloque de JavaScript
+const supabaseUrl = 'https://opkserkawziqdsvkyhky.supabase.co'; // Tu URL
+const supabaseKey = 'sb_publishable_U6Ljq3yho2djlRpkhcn9Cg_febIPxRj'; // La llave de tu foto
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // 3. Modificamos la función para que traiga los datos de la tabla
-    async function cargarDesdeSupabase() {
-      const { data, error } = await _supabase
-        .from('biblioteca') // El nombre de tu tabla
+// 2. Modifica la carga para que ESPERE a los datos
+async function cargarDatos() {
+    const { data, error } = await _supabase
+        .from('biblioteca') // Asegúrate que en Supabase se llame así con minúscula
         .select('*');
 
-      if (data) {
-        datos = data; // Reemplaza la lista manual 'datos.push'
-        datosFiltrados = [...datos];
-        mostrardatos(); // Dibuja las tarjetas en pantalla
-      }
+    if (error) {
+        console.log("Error:", error);
+        return;
     }
 
-    // Ejecutamos la carga al abrir la página
-    cargarDesdeSupabase();
+    if (data) {
+        datos = data; // Guardamos lo que vino de la nube
+        datosFiltrados = [...datos];
+        mostrardatos(); // RECIÉN AQUÍ dibujamos las tarjetas
+    }
+}
+
+// 3. Ejecutamos la carga
+cargarDatos();
   
   class contenido {
-    constructor(nombre,nombre2,nombre3,nombre4,tipo,pais,año,autor,guion,arte,revista,editor,imagen) {
+    constructor(nombre,romani,ingles,esplat,tipo,pais,año,autor,guion,arte,revista,editor,imagen) {
       this.nombre = nombre,
-      this.nombre2 = nombre2,
-      this.nombre3 = nombre3,
-      this.nombre4 = nombre4,
+      this.romani = romani,
+      this.ingles = ingles,
+      this.esplat = esplat,
       this.tipo = tipo,     
       this.pais = pais,
       this.año = año,
