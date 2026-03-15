@@ -3,7 +3,6 @@
 <head>
   <title>Total-Teka</title>
   <meta charset="UTF-8">
-  <meta name="author" content="Pumapro">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     *{ margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,10 +31,6 @@
       <option value="Manga">Manga</option>
       <option value="Pelicula">Película</option>
     </select>
-    <select id="ordenar" onchange="aplicarFiltros()">
-      <option value="abc">A-Z</option>
-      <option value="año-desc">Más nuevos</option>
-    </select>
   </nav>
 
   <div id="cards">Cargando biblioteca...</div>
@@ -48,9 +43,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // 2. TUS DATOS REALES DE LAS CAPTURAS
-    const supabaseUrl = 'https://opkserkawziqdsvkyhky.supabase.co'; 
-    const supabaseKey = 'sb_publishable_U6Ljq3yho2djlRpkhcn9Cg_febIPxRj'; // Reemplaza por la llave completa de tu captura
+    // DATOS DE CONEXIÓN REALES
+    const supabaseUrl = 'https://opkserkawziqdsvkyhky.supabase.co'; //
+    const supabaseKey = 'sb_p_48c77395066f2178302066555160533512396452'; //
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     let datos = [];
@@ -58,15 +53,13 @@
     let paginaActual = 1;
     const itemsPorPagina = 6;
 
-    // 3. FUNCIÓN PARA CARGAR DESDE LA NUBE
     async function cargarDesdeSupabase() {
       const { data, error } = await _supabase
-        .from('biblioteca') // Asegúrate que en Supabase se llame así
+        .from('Biblioteca') // <--- REVISA SI ES 'Biblioteca' O 'biblioteca'
         .select('*');
 
       if (error) {
-        document.getElementById("cards").innerHTML = "Error al conectar con la base de datos.";
-        console.error(error);
+        document.getElementById("cards").innerHTML = "Error al conectar con la base de datos: " + error.message;
       } else {
         datos = data || [];
         datosFiltrados = [...datos];
@@ -79,7 +72,7 @@
       cardsDiv.innerHTML = "";
       
       if (datosFiltrados.length === 0) {
-        cardsDiv.innerHTML = "<p>No hay elementos para mostrar.</p>";
+        cardsDiv.innerHTML = "<p>No hay elementos cargados en la tabla aún.</p>";
         return;
       }
 
@@ -101,13 +94,7 @@
 
     function aplicarFiltros() {
       const tipo = document.getElementById('filtroTipo').value;
-      const orden = document.getElementById('ordenar').value;
-
       datosFiltrados = datos.filter(i => tipo === 'Todos' || i.tipo === tipo);
-
-      if (orden === 'abc') datosFiltrados.sort((a,b) => a.nombre.localeCompare(b.nombre));
-      if (orden === 'año-desc') datosFiltrados.sort((a,b) => b.año - a.año);
-
       paginaActual = 1;
       mostrardatos();
     }
@@ -116,6 +103,7 @@
       const p = document.getElementById('paginacion');
       p.innerHTML = "";
       const total = Math.ceil(datosFiltrados.length / itemsPorPagina);
+      if (total <= 1) return;
       for (let i = 1; i <= total; i++) {
         const b = document.createElement('button');
         b.innerText = i;
@@ -125,7 +113,6 @@
       }
     }
 
-    // Iniciar carga
     cargarDesdeSupabase();
   </script>
 </body>
