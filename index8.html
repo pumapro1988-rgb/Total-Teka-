@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Total-Teka</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Pumapro">
+  <meta name="keywords" content="Películas, series, comics, mangas, libros, música">
+  <meta name="description" content="Toda la información sobre todos los temas posibles del mundo en la biblioteca mas grande del mundo.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{ margin: 0; padding: 0; box-sizing: border-box; }
+    body{ background: #000; color: white; font-family: sans-serif; }
+    .titulo{ width: 100%; }
+    nav{ text-align: center; padding: 10px; }
+    
+    #cards { display: flex; justify-content: space-evenly; flex-wrap: wrap; min-height: 200px; }
+    
+    /* Estilos de Tarjetas del Index 7 */
+    .tarjeta { position: relative; width: 171px; margin: 20px 0; text-align: center; border: 1px solid #ccc; font-weight: bold; color: white; }
+    .tarjeta.comic { background-color: blue; border-color: blue; }
+    .tarjeta.libro { background-color: green; border-color: green; }
+    .tarjeta.manga { background-color: #257AF8; border-color: #257AF8; }
+    .tarjeta.novela { background-color: white; border-color: white; color: black; }
+    .tarjeta.pelicula { background-color: black; border-color: #333; }
+    .tarjeta.serie { background-color: #EA1014; border-color: #EA1014; }
+    .tarjeta.videojuego { background-color: orange; border-color: orange; }
+
+    .images img { width: 170px; height: 260px; display: block; object-fit: cover; }    
+    .tarjeta .h2 { font-size: 0.9rem; margin: 10px 5px; }    
+    .tarjeta .h3 { font-size: 0.8rem; position: absolute; padding: 4px; top: 0; right: 0; z-index: 10; background: rgba(0,0,0,0.6); }    
+    
+    /* Paginación */
+    #paginacion { display: flex; gap: 10px; justify-content: center; margin: 20px 0; align-items: center; }
+    #paginacion button { padding: 8px 12px; border: none; border-radius: 4px; background: #6c757d; color: white; cursor: pointer; font-weight: bold; }
+    #paginacion button.activo { background: #007bff; }
+    
+    footer{ text-align: center; padding: 20px; font-size: 0.8rem; border-top: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <img class="titulo" src="https://opkserkawziqdsvkyhky.supabase.co/storage/v1/object/public/imagenes/titulo.png">
+  
+  <nav>
+    <select id="filtroTipo" onchange="aplicarFiltros()">
+      <option value="Todos">Todos</option>
+      <option value="Comic">Cómic</option>
+      <option value="Manga">Manga</option>
+      <option value="Novela">Novela</option>
+      <option value="Pelicula">Película</option>
+      <option value="Serie">Serie</option>
+      <option value="Videojuego">Videojuego</option>
+    </select>
+    <select id="ordenar" onchange="aplicarFiltros()">
+      <option value="abc">Nombre (A-Z)</option>
+      <option value="cba">Nombre (Z-A)</option>
+      <option value="año-asc">Año (0-9)</option>
+      <option value="año-desc">Año (9-0)</option>
+    </select>
+    <select id="filtroPais" onchange="aplicarFiltros()">
+      <option value="">Todos los Países</option>
+      <option value="Francia">Francia</option>
+      <option value="Japón">Japón</option>
+    </select>
+    <select id="filtroAutor" onchange="aplicarFiltros()">
+      <option value="">Todos los Autores</option>
+      <option value="Masashi Kishimoto">Masashi Kishimoto</option>
+      <option value="Pierre Boulle">Pierre Boulle</option>
+    </select>
+    <select id="filtroEditor" onchange="aplicarFiltros()">
+      <option value="">Todos los Editores</option>
+      <option value="Éditions Julliard">Éditions Julliard</option>
+      <option value="Shueisha">Shueisha</option>
+    </select>
+  </nav>
+
+  <div id="cards">Cargando biblioteca desde la nube...</div>
+  <div id="paginacion"></div>
+
+  <footer>
+    <p>Biblioteca de Pumapro y Paloma</p>
+    <p>Todos los derechos reservados</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const supabaseUrl = 'https://opkserkawziqdsvkyhky.supabase.co';
+    const supabaseKey = 'sb_publishable_U6Ljq3yho2djlRpkhcn9Cg_febIPxRj';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    let datos = [];
+    let datosFiltrados = [];
+    let paginaActual = 1;
+    const itemsPorPagina = 12;
+
+    async function cargarDesdeSupabase() {
+      const { data, error } = await _supabase
+        .from('Biblioteca') 
+        .select('*');
+
+      if (error) {
+        document.getElementById("cards").innerHTML = "Error al conectar con la base de datos: " + error.message;
+      } else {
+        datos = data || [];
+        aplicarFiltros(); // Aplicar filtros iniciales
+      }
+    }
+
+    function aplicarFiltros() {
+      const tipoSel = document.getElementById('filtroTipo').value;
+      const paisSel = document.getElementById('filtroPais').value;
+      const autorSel = document.getElementById('filtroAutor').value;
+      const editorSel = document.getElementById('filtroEditor').value;
+      const ordenSel = document.getElementById('ordenar').value;
+
+      // 1. Lógica de filtrado múltiple del Index 7
+      datosFiltrados = datos.filter(item => {
+        return (tipoSel === 'Todos' || item.tipo === tipoSel) &&
+               (paisSel === '' || item.pais === paisSel) &&
+               (autorSel === '' || item.autor === autorSel) &&
+               (editorSel === '' || item.editor === editorSel);
+      });
+
+      // 2. Lógica de ordenación
+      datosFiltrados.sort((a, b) => {
+        const nombreA = (a.nombre || "").toLowerCase();
+        const nombreB = (b.nombre || "").toLowerCase();
+        
+        if (ordenSel === 'abc') return nombreA.localeCompare(nombreB);
+        if (ordenSel === 'cba') return nombreB.localeCompare(nombreA);
+        if (ordenSel === 'año-asc') return (a.año || 0) - (b.año || 0) || nombreA.localeCompare(nombreB);
+        if (ordenSel === 'año-desc') return (b.año || 0) - (a.año || 0) || nombreA.localeCompare(nombreB);
+      });
+
+      paginaActual = 1;
+      mostrardatos();
+    }
+
+    function mostrardatos() {
+      const cardsDiv = document.getElementById("cards");
+      cardsDiv.innerHTML = "";
+      
+      if (datosFiltrados.length === 0) {
+        cardsDiv.innerHTML = "<p>No se encontraron resultados con esos filtros.</p>";
+        document.getElementById("paginacion").innerHTML = "";
+        return;
+      }
+
+      const inicio = (paginaActual - 1) * itemsPorPagina;
+      const fin = inicio + itemsPorPagina;
+      const paginados = datosFiltrados.slice(inicio, fin);
+
+      paginados.forEach(i => {
+        const clase = (i.tipo || 'manga').toLowerCase().replace(/\s+/g, '-');
+        cardsDiv.innerHTML += `
+          <div class="tarjeta ${clase}">
+            <div class="images"><img src="${i.imagen || ''}" onerror="this.src='https://via.placeholder.com/170x260'"></div>
+            <p class="h2">${i.nombre || 'Sin nombre'}</p>
+            <p class="h3">${i.año || ''}</p>
+          </div>`;
+      });
+      crearPaginacion();
+    }
+
+    function crearPaginacion() {
+      const contenedorPaginacion = document.getElementById('paginacion');
+      contenedorPaginacion.innerHTML = "";
+      const totalPaginas = Math.ceil(datosFiltrados.length / itemsPorPagina);
+
+      if (totalPaginas <= 1) return;
+
+      const rango = 2; // Botones alrededor de la página actual
+
+      for (let i = 1; i <= totalPaginas; i++) {
+        // Mostrar primera, última y las cercanas a la actual
+        if (i === 1 || i === totalPaginas || (i >= paginaActual - rango && i <= paginaActual + rango)) {
+          const b = document.createElement('button');
+          b.innerText = i;
+          if (i === paginaActual) b.className = 'activo';
+          b.onclick = () => { 
+            paginaActual = i; 
+            mostrardatos(); 
+            window.scrollTo(0, 0); // Sube al inicio al cambiar de página
+          };
+          contenedorPaginacion.appendChild(b);
+        } 
+        // Puntos suspensivos del Index 7
+        else if (i === paginaActual - rango - 1 || i === paginaActual + rango + 1) {
+          const puntos = document.createElement('span');
+          puntos.innerText = "...";
+          puntos.style.color = "white";
+          contenedorPaginacion.appendChild(puntos);
+        }
+      }
+    }
+
+    cargarDesdeSupabase();
+  </script>
+</body>
+</html>
